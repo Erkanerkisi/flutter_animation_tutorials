@@ -1,4 +1,3 @@
-import 'package:animation_tutorials/animated_heart/animated_heart.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatefulWidget {
@@ -28,15 +27,59 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  bool isLiked = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: ScaleTransition(
+          scale: Tween(begin: 15.0, end: 21.0).animate(_animationController),
+          child: GestureDetector(
+            onTap: (){
+              !isLiked ? doLike() : doUnlike();
+            },
+            child: Icon(
+              Icons.favorite,
+              color: isLiked ? Colors.red : Colors.black,
+              size: 5,
+            ),
+          ),
         ),
-        body: Center(
-          child: AnimatedHeart(),
-        ));
+      ),
+    );
+  }
+
+  doLike(){
+    setState(() {
+      isLiked = true;
+    });
+    _animationController.forward();
+  }
+  doUnlike(){
+    setState(() {
+      isLiked = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 150));
+    _animationController..addStatusListener((status) {
+      if(status == AnimationStatus.completed)
+        _animationController.reverse();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
   }
 }
